@@ -1,0 +1,93 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  name      String
+  avatarUrl String?
+  role      String   @default("member") // admin, member, viewer
+  teamId    String?
+  team      Team?    @relation(fields: [teamId], references: [id])
+  workflows Workflow[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Team {
+  id        String   @id @default(uuid())
+  name      String
+  members   User[]
+  workflows Workflow[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Workflow {
+  id          String              @id @default(uuid())
+  userId      String
+  user        User                @relation(fields: [userId], references: [id])
+  teamId      String?
+  team        Team?               @relation(fields: [teamId], references: [id])
+  name        String
+  description String              @default("")
+  definition  Json                // WorkflowDefinition JSON
+  status      String              @default("draft") // draft, active, paused, error, archived
+  templateId  String?
+  executions  WorkflowExecution[]
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+
+  @@index([userId])
+  @@index([teamId])
+  @@index([status])
+}
+
+model WorkflowExecution {
+  id          String   @id @default(uuid())
+  workflowId  String
+  workflow    Workflow  @relation(fields: [workflowId], references: [id], onDelete: Cascade)
+  status      String   @default("pending") // pending, running, completed, failed
+  triggerData Json     @default("{}")
+  steps       Json     @default("[]") // ExecutionStep[]
+  error       String?
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+
+  @@index([workflowId])
+  @@index([status])
+}
+
+model Integration {
+  id          String   @id @default(uuid())
+  userId      String
+  provider    String   // gmail, slack, stripe, webhook, etc.
+  name        String
+  credentials Json     // encrypted credentials
+  status      String   @default("connected") // connected, disconnected, error
+  lastSynced  DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, provider])
+  @@index([userId])
+}
+
+model WorkflowTemplate {
+  id             String @id @default(uuid())
+  name           String
+  description    String
+  category       String
+  definition     Json   // WorkflowDefinition
+  setupQuestions Json   @default("[]") // TemplateQuestion[]
+  usageCount     Int    @default(0)
+  createdAt      DateTime @default(now())
+
+  @@index([category])
+}
