@@ -6,8 +6,9 @@ import { ChatBuilder } from '@/components/ChatBuilder';
 import { WorkflowList } from '@/components/WorkflowList';
 import { TemplateGallery } from '@/components/TemplateGallery';
 import { IntegrationsHub } from '@/components/IntegrationsHub';
+import { ROIDashboard } from '@/components/ROIDashboard';
 
-type View = 'dashboard' | 'builder' | 'templates' | 'integrations';
+type View = 'dashboard' | 'builder' | 'templates' | 'integrations' | 'analytics';
 
 export default function Home() {
   const [view, setView] = useState<View>('dashboard');
@@ -33,6 +34,7 @@ export default function Home() {
               { key: 'builder', label: 'Builder', icon: '⚡' },
               { key: 'templates', label: 'Templates', icon: '📦' },
               { key: 'integrations', label: 'Integrations', icon: '🔗' },
+              { key: 'analytics', label: 'Analytics', icon: '📊' },
             ].map((item) => (
               <button
                 key={item.key}
@@ -87,6 +89,7 @@ export default function Home() {
           />
         )}
         {view === 'integrations' && <IntegrationsHub />}
+        {view === 'analytics' && <ROIDashboard />}
       </main>
     </div>
   );

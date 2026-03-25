@@ -7,6 +7,8 @@ import { executionRoutes } from './routes/executions.js';
 import { aiRoutes } from './routes/ai.js';
 import { integrationRoutes } from './routes/integrations.js';
 import { debuggerRoutes } from './routes/debugger.js';
+import { analyticsRoutes } from './routes/analytics.js';
+import { teamRoutes } from './routes/teams.js';
 import { seedTemplates } from './services/seed-templates.js';
 
 const app = express();
@@ -28,6 +30,8 @@ app.use('/api/executions', executionRoutes(prisma));
 app.use('/api/ai', aiRoutes(prisma));
 app.use('/api/integrations', integrationRoutes(prisma));
 app.use('/api/debug', debuggerRoutes(prisma));
+app.use('/api/analytics', analyticsRoutes(prisma));
+app.use('/api/teams', teamRoutes(prisma));
 
 // Error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -35,9 +39,17 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: 'Internal server error' });
 });
 
-// Seed templates and start
+// Seed data and start
 async function start() {
+  // Ensure default user exists
+  await prisma.user.upsert({
+    where: { id: 'user-jack' },
+    create: { id: 'user-jack', email: 'jack.williams@scalarepartners.com', name: 'Jack Williams', role: 'admin' },
+    update: {},
+  });
+
   await seedTemplates(prisma);
+
   app.listen(port, () => {
     console.log(`FlowMate API running on port ${port}`);
   });
