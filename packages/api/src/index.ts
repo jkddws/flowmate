@@ -5,6 +5,9 @@ import { workflowRoutes } from './routes/workflows.js';
 import { templateRoutes } from './routes/templates.js';
 import { executionRoutes } from './routes/executions.js';
 import { aiRoutes } from './routes/ai.js';
+import { integrationRoutes } from './routes/integrations.js';
+import { debuggerRoutes } from './routes/debugger.js';
+import { seedTemplates } from './services/seed-templates.js';
 
 const app = express();
 const prisma = new PrismaClient();
@@ -23,6 +26,8 @@ app.use('/api/workflows', workflowRoutes(prisma));
 app.use('/api/templates', templateRoutes(prisma));
 app.use('/api/executions', executionRoutes(prisma));
 app.use('/api/ai', aiRoutes(prisma));
+app.use('/api/integrations', integrationRoutes(prisma));
+app.use('/api/debug', debuggerRoutes(prisma));
 
 // Error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
@@ -30,8 +35,14 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
   res.status(500).json({ error: 'Internal server error' });
 });
 
-app.listen(port, () => {
-  console.log(`FlowMate API running on port ${port}`);
-});
+// Seed templates and start
+async function start() {
+  await seedTemplates(prisma);
+  app.listen(port, () => {
+    console.log(`FlowMate API running on port ${port}`);
+  });
+}
+
+start().catch(console.error);
 
 export { prisma };

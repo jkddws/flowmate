@@ -5,8 +5,9 @@ import { WorkflowCanvas } from '@/components/WorkflowCanvas';
 import { ChatBuilder } from '@/components/ChatBuilder';
 import { WorkflowList } from '@/components/WorkflowList';
 import { TemplateGallery } from '@/components/TemplateGallery';
+import { IntegrationsHub } from '@/components/IntegrationsHub';
 
-type View = 'dashboard' | 'builder' | 'templates';
+type View = 'dashboard' | 'builder' | 'templates' | 'integrations';
 
 export default function Home() {
   const [view, setView] = useState<View>('dashboard');
@@ -24,12 +25,14 @@ export default function Home() {
               </svg>
             </div>
             <h1 className="text-xl font-bold text-gray-900">FlowMate</h1>
+            <span className="text-xs px-2 py-0.5 rounded bg-primary-50 text-primary-700 font-medium">Beta</span>
           </div>
-          <nav className="flex gap-2">
+          <nav className="flex gap-1">
             {[
-              { key: 'dashboard', label: 'My Workflows' },
-              { key: 'builder', label: 'New Workflow' },
-              { key: 'templates', label: 'Templates' },
+              { key: 'dashboard', label: 'Workflows', icon: '📋' },
+              { key: 'builder', label: 'Builder', icon: '⚡' },
+              { key: 'templates', label: 'Templates', icon: '📦' },
+              { key: 'integrations', label: 'Integrations', icon: '🔗' },
             ].map((item) => (
               <button
                 key={item.key}
@@ -40,7 +43,7 @@ export default function Home() {
                     : 'text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                {item.label}
+                {item.icon} {item.label}
               </button>
             ))}
           </nav>
@@ -66,7 +69,6 @@ export default function Home() {
             <div className="lg:col-span-1">
               <ChatBuilder
                 onWorkflowGenerated={(definition) => {
-                  // TODO: set definition on canvas
                   console.log('Generated:', definition);
                 }}
               />
@@ -78,12 +80,13 @@ export default function Home() {
         )}
         {view === 'templates' && (
           <TemplateGallery
-            onUse={(templateId) => {
+            onUse={(_templateId) => {
               setEditingWorkflowId(null);
               setView('builder');
             }}
           />
         )}
+        {view === 'integrations' && <IntegrationsHub />}
       </main>
     </div>
   );
