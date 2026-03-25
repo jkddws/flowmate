@@ -7,3 +7,39 @@ body {
   background: #f9fafb;
   color: #111827;
 }
+
+/* Mobile nav scrolling */
+@media (max-width: 768px) {
+  nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  nav::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* React Flow overrides */
+.react-flow__node {
+  cursor: grab;
+}
+.react-flow__node:active {
+  cursor: grabbing;
+}
+
+/* Loading animation */
+@keyframes pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+.animate-pulse-slow {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Smooth transitions */
+* {
+  transition-property: background-color, border-color, box-shadow;
+  transition-duration: 150ms;
+  transition-timing-function: ease;
+}
